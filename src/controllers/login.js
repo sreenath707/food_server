@@ -9,7 +9,6 @@ function signup(req, res) {
     .findOne({ username: username })
     .then((user) => {
       if (user) {
-        res.statusCode = 401;
         res.send({ signUpSuccess: false, msg: "account already exists" });
       } else {
         users
@@ -20,7 +19,6 @@ function signup(req, res) {
           })
           .catch((err) => {
             console.error(err);
-            res.statusCode = 401;
             res.send({ signUpSuccess: false, msg: err });
           });
       }
@@ -49,17 +47,14 @@ function login(req, res) {
             token: token,
           });
         } else {
-          res.statusCode = 401;
           res.send({ loggedIn: false, msg: "incorrect password" });
         }
       } else {
-        res.statusCode = 401;
         res.send({ loggedIn: false, msg: "user not found" });
       }
     })
     .catch((err) => {
       console.log(err);
-      res.statusCode = 401;
       res.send({ loggedIn: false, msg: err });
     });
 }
