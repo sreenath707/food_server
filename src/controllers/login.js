@@ -2,6 +2,7 @@ const users = require('../models/user')
 const jwt = require('jsonwebtoken')
 
 const secret_key = 'bussss'
+const refresh_secret_key = 'buhahahah'
 
 function signup(req, res) {
   const { username, email, password } = req.body
@@ -18,9 +19,14 @@ function signup(req, res) {
               { username: username, email: email },
               secret_key
             )
+            let refreshToken = jwt.sign(
+              { username: user.username },
+              refresh_secret_key
+            )
             res.send({
               signUpSuccess: true,
               token: token,
+              refreshToken: refreshToken,
               msg: 'inserted',
             })
           })
@@ -47,11 +53,16 @@ function login(req, res) {
             { username: user.username, email: user.email },
             secret_key
           )
+          let refreshToken = jwt.sign(
+            { username: user.username },
+            refresh_secret_key
+          )
           // res.cookie("authToken", token);
           res.send({
             loggedIn: true,
             user: { username: user.username, email: user.email },
             token: token,
+            refreshToken: refreshToken,
           })
         } else {
           res.send({ loggedIn: false, msg: 'incorrect password' })
