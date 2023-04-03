@@ -1,66 +1,69 @@
-const express = require('express')
-let router = express.Router()
-const users = require('../models/user')
-const { signup, login } = require('../controllers/login')
-const jwt = require('jsonwebtoken')
+const express = require("express");
+let router = express.Router();
+const users = require("../models/user");
+const { signup, login } = require("../controllers/login");
+const jwt = require("jsonwebtoken");
 
-router.post('/signup', signup)
+router.post("/signup", signup);
 
-router.post('/login', login)
+router.post("/login", login);
 
-router.post('/user', (req, res) => {
-  if (!req.body.token) {
-    res.statusCode = 401
-    res.send('login to access the end point')
-    return
+router.post("/user", (req, res) => {
+  const header = req.headers.token;
+  if (!header) {
+    res.statusCode = 401;
+    res.send("login to access the end point");
+    return;
   }
+  const token = header.slice(7);
+  console.log(token);
   try {
-    let user = jwt.verify(req.body.token, 'bussss')
+    let user = jwt.verify(token, "bussss");
+    console.log(user);
     users
       .findOne(user)
       .then((data) => {
         if (!data) {
-          res.statusCode = 401
-          res.send({ loggedin: false })
+          res.statusCode = 401;
+          res.send({ loggedin: false });
         }
-        res.send({ username: data.username, email: user.email })
+        res.send({ username: data.username, email: user.email });
       })
       .catch((err) => {
-        res.statusCode = 401
-        res.send(err)
-      })
+        res.statusCode = 401;
+        res.send(err);
+      });
   } catch (err) {
-    res.statusCode = 401
-    res.send(err)
+    res.statusCode = 401;
+    res.send(err);
   }
-})
+});
 
-router.post('/refresh', (req, res) => {
+router.post("/refresh", (req, res) => {
   if (!req.body.refreshToken) {
-    res.statusCode = 401
-    res.send('login to access the end point')
-    return
+    res.statusCode = 401;
+    res.send("login to access the end point");
+    return;
   }
   try {
-    let user = jwt.verify(req.body.token, 'buhahahah')
+    let user = jwt.verify(req.body.token, "buhahahah");
     users
       .findOne(user)
       .then((data) => {
         if (!data) {
-          res.statusCode = 401
-          res.send({ loggedin: false })
+          res.statusCode = 401;
+          res.send({ loggedin: false });
         }
-        let token = jwt.sign({ username: username, email: email }, secret_key)
-        res.send({ token: token })
+        let token = jwt.sign({ username: username, email: email }, secret_key);
+        res.send({ token: token });
       })
       .catch((err) => {
-        res.statusCode = 401
-        res.send(err)
-      })
+        res.statusCode = 401;
+        res.send(err);
+      });
   } catch (err) {
-    res.statusCode = 401
-    res.send(err)
+    res.send(err);
   }
-})
+});
 
-module.exports = router
+module.exports = router;
